@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Terapias | Inicio - Tu Guía Holística</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="home">
+
+    <header class="navbar">
+        <a href="index.html" class="logo">PORTAL <span>DE TERAPIAS</span></a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#home">Inicio</a></li>
+                <li><a href="#disciplinas">Disciplinas</a></li>
+                <li><a href="#directorio-preview">Directorio</a></li>
+                <li><a href="#como-funciona">Cómo funciona</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" id="hamburger" aria-label="Abrir menú">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-overlay"></div>
+            <div class="hero-content reveal">
+                <p class="hero-eyebrow">Directorio Holístico · Argentina</p>
+                <h1>Tu guía hacia el<br><span class="gradient-text">Despertar Interior</span></h1>
+                <p class="hero-subtitle">Conectá con terapeutas y guías espirituales certificados.<br>Un camino hacia el autoconocimiento, la sanación y la expansión de la conciencia.</p>
+                <div class="hero-actions">
+                    <a href="#directorio-preview" class="btn-primary" style="text-decoration: none; display: inline-block;">Explorar Directorio</a>
+                    <a href="#disciplinas" class="btn-secondary" style="text-decoration: none;">Ver Disciplinas</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="disciplinas" class="disciplines-container">
+            <div class="section-header reveal">
+                <h2 class="section-title">Explora las <span class="gradient-text">Disciplinas</span></h2>
+                <p>Descubre la técnica que mejor resuena con tu momento actual.</p>
+            </div>
+            <div class="disciplines-grid">
+                <div class="discipline-card reveal" style="transition-delay: 0.1s;">
+                    <i data-lucide="book-open"></i>
+                    <h3>Registros Akáshicos</h3>
+                    <p>Accede a la memoria del alma y obtén claridad en tu propósito de vida.</p>
+                </div>
+                <div class="discipline-card reveal" style="transition-delay: 0.2s;">
+                    <i data-lucide="network"></i>
+                    <h3>Constelaciones</h3>
+                    <p>Sana vínculos ancestrales y libera patrones familiares inconscientes.</p>
+                </div>
+                <div class="discipline-card reveal" style="transition-delay: 0.3s;">
+                    <i data-lucide="fingerprint"></i>
+                    <h3>Sesiones de Tapping</h3>
+                    <p>Liberación emocional rápida a través de puntos de acupresión (EFT).</p>
+                </div>
+                <div class="discipline-card reveal" style="transition-delay: 0.4s;">
+                    <i data-lucide="brain-circuit"></i>
+                    <h3>Decodificación</h3>
+                    <p>Encuentra el origen emocional oculto detrás de los síntomas físicos.</p>
+                </div>
+                <div class="discipline-card reveal" style="transition-delay: 0.5s;">
+                    <i data-lucide="wind"></i>
+                    <h3>Reiki</h3>
+                    <p>Armonización energética profunda para equilibrar tu cuerpo y mente.</p>
+                </div>
+                <div class="discipline-card reveal" style="transition-delay: 0.6s;">
+                    <i data-lucide="compass"></i>
+                    <h3>Coaching</h3>
+                    <p>Acompañamiento estratégico para alcanzar tus metas personales y profesionales.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="como-funciona" class="steps-section">
+            <h2 class="section-title reveal">Tu camino es <span class="gradient-text">Simple</span></h2>
+            <div class="steps-grid">
+                <div class="step reveal" style="transition-delay: 0.1s;">
+                    <div class="step-icon"><i data-lucide="search"></i></div>
+                    <h3>Busca</h3>
+                    <p>Filtra por disciplina o técnica según tu necesidad.</p>
+                </div>
+                <div class="step reveal" style="transition-delay: 0.2s;">
+                    <div class="step-icon"><i data-lucide="user-check"></i></div>
+                    <h3>Elige</h3>
+                    <p>Revisa perfiles, calificaciones y experiencias reales.</p>
+                </div>
+                <div class="step reveal" style="transition-delay: 0.3s;">
+                    <div class="step-icon"><i data-lucide="calendar-check"></i></div>
+                    <h3>Conecta</h3>
+                    <p>Agenda tu sesión y comienza tu transformación.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="directorio-preview" class="directory-container">
+            <h2 class="section-title reveal">Guías <span class="gradient-text">Destacados</span></h2>
+            
+            <div id="grid-profesionales" class="grid-container">
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <p>Sintonizando con el universo de guías...</p>
+                </div>
+            </div>
+
+            <div class="reveal" style="text-align: center; margin-top: 4rem;">
+                <a href="directorio.html" class="btn-secondary">Ver Directorio Completo</a>
+            </div>
+        </section>
+
+        <section class="cta-section reveal">
+            <div class="cta-card">
+                <h2>¿Eres terapeuta o profesional holístico?</h2>
+                <p>Súmate a la red de Portal de Terapias y conecta con personas que buscan tu guía.</p>
+                <a href="#contacto" class="btn-primary" style="text-decoration:none; display:inline-block;">Unirse a la Red</a>
+            </div>
+        </section>
+
+        <section id="contacto" class="contact-section">
+            <div class="contact-grid">
+                <div class="contact-info reveal">
+                    <h2 class="section-title">Hablemos de <span class="gradient-text">Energía</span></h2>
+                    <p>¿Tienes dudas sobre cómo funciona la plataforma o quieres unirte a nuestra red? Escríbenos y te responderemos a la brevedad.</p>
+                    
+                    <div class="info-list">
+                        <div class="info-item">
+                            <i data-lucide="mail"></i>
+                            <span>hola@pulsocosmico.com</span>
+                        </div>
+                        <div class="info-item">
+                            <i data-lucide="map-pin"></i>
+                            <span>Sesiones globales (Online)</span>
+                        </div>
+                        <div class="info-item">
+                            <i data-lucide="message-circle"></i>
+                            <span>Soporte vía WhatsApp: +54 11 1234-5678</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper reveal" style="transition-delay: 0.2s;">
+                    <form id="contactForm" class="contact-form">
+                        <div class="form-group">
+                            <label for="nombre">Tu Nombre</label>
+                            <input type="text" id="nombre" class="form-control" placeholder="Ej. Artemisa Luna" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Tu Correo Electrónico</label>
+                            <input type="email" id="email" class="form-control" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mensaje">¿En qué podemos ayudarte?</label>
+                            <textarea id="mensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary" style="width: 100%;">Enviar Mensaje</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer reveal">
+        <div class="footer-grid">
+            <div class="footer-about">
+                <div class="logo">PORTAL <span>DE TERAPIAS</span></div>
+                <p>Un espacio dedicado a la expansión de la conciencia y el bienestar espiritual.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navegación</h4>
+                <ul>
+                    <li><a href="#home">Inicio</a></li>
+                    <li><a href="directorio.html">Directorio</a></li>
+                    <li><a href="#disciplinas">Disciplinas</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h4>Conecta</h4>
+                <div class="social-icons">
+                    <i data-lucide="instagram"></i>
+                    <i data-lucide="facebook"></i>
+                    <i data-lucide="mail"></i>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Portal de Terapias. Hecho con ✨ para el universo.</p>
+        </div>
+    </footer>
+
+    <div id="perfilModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="cerrarModal()" aria-label="Cerrar modal"><i data-lucide="x"></i></button>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
