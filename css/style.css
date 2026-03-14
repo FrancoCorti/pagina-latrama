@@ -471,4 +471,6 @@ body { background-color: var(--bg-deep); }
     .modal-image { position: relative; }
     .modal-info { padding: 2rem 1.5rem; }
     .modal-stats { flex-direction: column; gap: 1.5rem; }
+
+    .hero { background-attachment: scroll; }
 }
