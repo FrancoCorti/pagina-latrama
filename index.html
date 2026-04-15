@@ -4,18 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Trama | Inicio - Tu Guía Holística</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="home">
 
     <div id="intro-splash" class="intro-splash" aria-hidden="true">
+        <div class="intro-sky"></div>
         <div class="intro-stars"></div>
         <div class="intro-content">
             <p class="intro-welcome">Bienvenidos a</p>
-            <h1 class="intro-title">LA TRAMA</h1>
-            <div class="intro-line"></div>
+            <div class="intro-title-wrap">
+                <svg class="intro-shooting-star" viewBox="0 0 600 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="trailGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#F0EBFF" stop-opacity="0"/>
+                            <stop offset="40%" stop-color="#A78BFA" stop-opacity="0.55"/>
+                            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="1"/>
+                        </linearGradient>
+                        <radialGradient id="starGlow" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    <path class="star-trail" d="M 60 -60 C 180 -150, 460 -150, 580 60" fill="none" stroke="url(#trailGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <g class="star-sparkle" transform="translate(580 60)">
+                        <circle r="14" fill="url(#starGlow)" opacity="0.8"/>
+                        <path d="M0,-14 L2.5,-2.5 L14,0 L2.5,2.5 L0,14 L-2.5,2.5 L-14,0 L-2.5,-2.5 Z" fill="#FFFFFF"/>
+                        <circle r="2" fill="#FFFFFF"/>
+                    </g>
+                </svg>
+                <h1 class="intro-title">LA TRAMA</h1>
+            </div>
         </div>
     </div>
 
@@ -133,42 +154,25 @@
         </section>
 
         <section id="contacto" class="contact-section">
-            <div class="contact-grid">
-                <div class="contact-info reveal">
-                    <h2 class="section-title">Hablemos de <span class="gradient-text">Energía</span></h2>
-                    <p>¿Tienes dudas sobre cómo funciona la plataforma o quieres unirte a nuestra red? Escríbenos y te responderemos a la brevedad.</p>
-                    
-                    <div class="info-list">
-                        <div class="info-item">
-                            <i data-lucide="mail"></i>
-                            <span>hola@pulsocosmico.com</span>
-                        </div>
-                        <div class="info-item">
-                            <i data-lucide="map-pin"></i>
-                            <span>Sesiones globales (Online)</span>
-                        </div>
-                        <div class="info-item">
-                            <span>Soporte vía WhatsApp: +54 11 1234-5678</span>
+            <div class="contact-inner reveal">
+                <h2 class="section-title">Hablemos de <span class="gradient-text">Energía</span></h2>
+                <p class="contact-lead">¿Querés unirte a nuestra red o tenés dudas sobre cómo funciona la plataforma? Escribinos y te respondemos a la brevedad.</p>
+                <div class="contact-items">
+                    <div class="contact-item">
+                        <i data-lucide="mail"></i>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">Email</span>
+                            <span class="contact-item-value">hola@pulsocosmico.com</span>
                         </div>
                     </div>
-                </div>
-
-                <div class="contact-form-wrapper reveal" style="transition-delay: 0.2s;">
-                    <form id="contactForm" class="contact-form">
-                        <div class="form-group">
-                            <label for="nombre">Tu Nombre</label>
-                            <input type="text" id="nombre" class="form-control" placeholder="Ej. Artemisa Luna" required>
+                    <a href="https://wa.me/542923574897" target="_blank" class="contact-item">
+                        <i data-lucide="message-circle"></i>
+                        <div class="contact-item-text">
+                            <span class="contact-item-label">WhatsApp</span>
+                            <span class="contact-item-value">+54 11 2923 57-4897</span>
                         </div>
-                        <div class="form-group">
-                            <label for="email">Tu Correo Electrónico</label>
-                            <input type="email" id="email" class="form-control" placeholder="correo@ejemplo.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="mensaje">¿En qué podemos ayudarte?</label>
-                            <textarea id="mensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn-primary" style="width: 100%;">Enviar Mensaje</button>
-                    </form>
+                        <i data-lucide="arrow-up-right" class="contact-item-arrow"></i>
+                    </a>
                 </div>
             </div>
         </section>
@@ -199,17 +203,12 @@
                             <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                         </svg>
                     </a>
-                    <a href="#" aria-label="Facebook" class="social-btn">
+                    <a href="https://wa.me/542923574897" target="_blank" aria-label="WhatsApp" class="social-btn">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
                         </svg>
                     </a>
-                    <a href="#contacto" aria-label="Email" class="social-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                            <polyline points="22,6 12,13 2,6"></polyline>
-                        </svg>
-                    </a>
+
                 </div>
             </div>
         </div>

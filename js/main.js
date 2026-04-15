@@ -36,7 +36,7 @@ function initIntroSplash() {
     setTimeout(() => {
         document.documentElement.classList.remove('intro-active');
         splash.remove();
-    }, 4700);
+    }, 5600);
 }
 
 // ==========================================
