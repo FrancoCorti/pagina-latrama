@@ -3,15 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Terapias | Inicio - Tu Guía Holística</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <title>La Trama | Inicio - Tu Guía Holística</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body data-page="home">
 
+    <div id="intro-splash" class="intro-splash" aria-hidden="true">
+        <div class="intro-stars"></div>
+        <div class="intro-content">
+            <p class="intro-welcome">Bienvenidos a</p>
+            <h1 class="intro-title">LA TRAMA</h1>
+            <div class="intro-line"></div>
+        </div>
+    </div>
+
     <header class="navbar">
-        <a href="index.html" class="logo">PORTAL <span>DE TERAPIAS</span></a>
+        <a href="#home" class="logo"><img src="assets/logo-tarot.png" alt="La Trama"></a>
         <nav>
             <ul class="nav-links">
                 <li><a href="#home">Inicio</a></li>
@@ -90,12 +99,12 @@
                 <div class="step reveal" style="transition-delay: 0.2s;">
                     <div class="step-icon"><i data-lucide="user-check"></i></div>
                     <h3>Elige</h3>
-                    <p>Revisa perfiles, calificaciones y experiencias reales.</p>
+                    <p>Revisa perfiles, calificaciones y experiencias verificadas.</p>
                 </div>
                 <div class="step reveal" style="transition-delay: 0.3s;">
                     <div class="step-icon"><i data-lucide="calendar-check"></i></div>
                     <h3>Conecta</h3>
-                    <p>Agenda tu sesión y comienza tu transformación.</p>
+                    <p>Agenda tu sesión y comenza tu transformación.</p>
                 </div>
             </div>
         </section>
@@ -118,7 +127,7 @@
         <section class="cta-section reveal">
             <div class="cta-card">
                 <h2>¿Eres terapeuta o profesional holístico?</h2>
-                <p>Súmate a la red de Portal de Terapias y conecta con personas que buscan tu guía.</p>
+                <p>Súmate a la red de La Trama y conecta con personas que buscan tu guía.</p>
                 <a href="#contacto" class="btn-primary" style="text-decoration:none; display:inline-block;">Unirse a la Red</a>
             </div>
         </section>
@@ -169,7 +178,7 @@
     <footer class="main-footer reveal">
         <div class="footer-grid">
             <div class="footer-about">
-                <div class="logo">PORTAL <span>DE TERAPIAS</span></div>
+                <div class="logo"><img src="assets/logo-tarot.png" alt="La Trama"></div>
                 <p>Un espacio dedicado a la expansión de la conciencia y el bienestar espiritual.</p>
             </div>
             <div class="footer-links">
@@ -184,14 +193,29 @@
             <div class="footer-social">
                 <h4>Conecta</h4>
                 <div class="social-icons">
-                    <i data-lucide="instagram"></i>
-                    <i data-lucide="facebook"></i>
-                    <i data-lucide="mail"></i>
+                    <a href="#" aria-label="Instagram" class="social-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                        </svg>
+                    </a>
+                    <a href="#" aria-label="Facebook" class="social-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                        </svg>
+                    </a>
+                    <a href="#contacto" aria-label="Email" class="social-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Portal de Terapias. Hecho con ✨ para el universo.</p>
+            <p>&copy; 2026 La Trama. Todos los derechos reservados.</p>
         </div>
     </footer>
 
@@ -203,6 +227,6 @@
         </div>
     </div>
 
-    <script src="js/main.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

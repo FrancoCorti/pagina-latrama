@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function esAdmin() {
+      return request.auth != null
+          && request.auth.uid in ['behXpqwUpKfzesfAkTSXUMAJboC2'];
+    }
+
+    match /profesionales/{docId}/{archivo=**} {
+      allow read: if true;
+      allow write: if esAdmin()
+                   && request.resource.size < 2 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

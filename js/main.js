@@ -1,14 +1,10 @@
 /**
- * PULSO CÓSMICO - Lógica Multi-página, Modal, Animaciones y CONEXIÓN A GOOGLE SHEETS
+ * PULSO CÓSMICO - Lógica Multi-página, Modal, Animaciones y CONEXIÓN A FIRESTORE
  */
 
-// ==========================================
-// 1. CONFIGURACIÓN DE GOOGLE SHEETS
-// ==========================================
-// Pega aquí el link que obtienes en "Archivo > Compartir > Publicar en la web" (formato .csv)
-const URL_GOOGLE_SHEET_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTh-Mtihak3ol8bn00ieUbItVS6y07w--pFBDTlNsslC4DRVVEG67GAL4A3I1lQvvi_Bm1cXNsvxOHY/pub?output=csv"; 
+import { cargarProfesionalesDesdeFirestore } from "./data-source.js";
 
-// Datos de respaldo (Graceful Degradation) por si el Sheet falla o aún no configuras el link
+// Datos de respaldo (Graceful Degradation) por si Firestore falla
 const fallbackProfesionales = [
     { id: 1, nombre: "Marta Gutierrez", especialidad: "Reiki", rating: 4.9, img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80", bio: "Acompaño procesos de sanación profunda...", modalidad: "Online (Zoom)", experiencia: "+7 años" },
     { id: 2, nombre: "Julián Solar", especialidad: "Constelaciones", rating: 4.7, img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500", bio: "Especialista en Constelaciones Familiares...", modalidad: "Online / Presencial", experiencia: "5 años" },
@@ -23,6 +19,7 @@ let profesionales = [];
 // ==========================================
 document.addEventListener('DOMContentLoaded', async () => {
     if (typeof lucide !== 'undefined') lucide.createIcons();
+    initIntroSplash();
     initScrollAnimations();
     initContactForm();
     initModalEvents();
@@ -32,56 +29,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarDatosDeBase();
 });
 
+function initIntroSplash() {
+    const splash = document.getElementById('intro-splash');
+    if (!splash) return;
+    document.documentElement.classList.add('intro-active');
+    setTimeout(() => {
+        document.documentElement.classList.remove('intro-active');
+        splash.remove();
+    }, 4700);
+}
+
 // ==========================================
-// 3. MOTOR DE DATOS (FETCH A GOOGLE SHEETS)
+// 3. MOTOR DE DATOS (FETCH A FIRESTORE)
 // ==========================================
 async function cargarDatosDeBase() {
     try {
-        // Si el usuario aún no puso su link, usa el respaldo directamente
-        if (URL_GOOGLE_SHEET_CSV === "TU_LINK_DE_GOOGLE_SHEET_AQUI_CSV") {
-            console.warn("Aviso: Aún no has configurado tu link de Google Sheets. Usando datos de prueba.");
-            profesionales = fallbackProfesionales;
-            iniciarVistas();
-            return;
-        }
-
-        const respuesta = await fetch(URL_GOOGLE_SHEET_CSV);
-        if (!respuesta.ok) throw new Error("Error en la red al conectar con Google Sheets");
-        
-        const textoCSV = await respuesta.text();
-        profesionales = csvToJSON(textoCSV);
-        console.log("Datos cargados exitosamente de Google Sheets:", profesionales);
-        
+        profesionales = await cargarProfesionalesDesdeFirestore();
+        console.log("Datos cargados exitosamente desde Firestore:", profesionales);
         iniciarVistas();
-
     } catch (error) {
         console.error("Error cargando base de datos, usando respaldo.", error);
-        profesionales = fallbackProfesionales; // Fallback seguro
+        profesionales = fallbackProfesionales;
         iniciarVistas();
     }
-}
-
-// Convertidor ligero y seguro de CSV a Array de Objetos JSON
-function csvToJSON(csvStr) {
-    const lineas = csvStr.split('\n');
-    const resultado = [];
-    const encabezados = lineas[0].split(',').map(h => h.trim().toLowerCase());
-
-    for (let i = 1; i < lineas.length; i++) {
-        if (!lineas[i].trim()) continue; // Salta líneas vacías
-        // Expresión regular para separar por comas pero ignorar comas dentro de comillas
-        const lineaActual = lineas[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        const obj = {};
-
-        encabezados.forEach((encabezado, index) => {
-            let valor = lineaActual[index] ? lineaActual[index].replace(/^"|"$/g, '').trim() : '';
-            // Forzar números donde corresponde
-            if (encabezado === 'id' || encabezado === 'rating') valor = Number(valor) || 0;
-            obj[encabezado] = valor;
-        });
-        resultado.push(obj);
-    }
-    return resultado;
 }
 
 // ==========================================
@@ -186,7 +156,7 @@ function renderizarProfesionales(lista, contenedor) {
                     (${pro.rating})
                 </span>
             </div>
-            <button class="btn-primary" onclick="abrirModal(${pro.id})" style="margin-top:auto; width:100%; border-radius: 12px; font-size: 0.85rem; padding: 0.8rem;">
+            <button class="btn-primary" onclick="abrirModal('${pro.id}')" style="margin-top:auto; width:100%; border-radius: 12px; font-size: 0.85rem; padding: 0.8rem;">
                 Ver Perfil
             </button>
         </article>
@@ -199,6 +169,31 @@ function obtenerEstrellasHTML(rating) {
     const fullStars = Math.floor(rating) || 0;
     const limitStars = fullStars > 5 ? 5 : (fullStars < 0 ? 0 : fullStars);
     return "★".repeat(limitStars) + "☆".repeat(5 - limitStars);
+}
+
+const WHATSAPP_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+</svg>`;
+
+function construirBotonWhatsapp(pro) {
+    const numero = (pro.whatsapp || "").replace(/\D/g, "");
+    if (!numero) {
+        return `
+            <button class="btn-primary" disabled style="width: 100%; font-size: 1.1rem; padding: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; opacity: 0.5; cursor: not-allowed;">
+                ${WHATSAPP_SVG} Contacto no disponible
+            </button>
+        `;
+    }
+    const mensaje = encodeURIComponent(`Hola ${pro.nombre || ""}, vi tu perfil en La Trama y me gustaría reservar un turno.`);
+    const url = `https://wa.me/${numero}?text=${mensaje}`;
+    return `
+        <a href="${url}" target="_blank" rel="noopener" style="text-decoration:none;">
+            <button class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; background: #25D366;">
+                ${WHATSAPP_SVG} Reservar por WhatsApp
+            </button>
+        </a>
+    `;
 }
 
 // ==========================================
@@ -279,11 +274,7 @@ window.abrirModal = function(id) {
                     </div>
                 </div>
 
-                <a href="https://wa.me/tunumerodetelefono" target="_blank" style="text-decoration:none;">
-                    <button class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px;">
-                        <i data-lucide="calendar-check"></i> Reservar Turno
-                    </button>
-                </a>
+                ${construirBotonWhatsapp(pro)}
             </div>
         </div>
     `;

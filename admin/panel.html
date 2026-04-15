@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Profesionales | La Trama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+
+    <header class="admin-header">
+        <h1 class="admin-title">Panel · Profesionales</h1>
+        <div class="admin-header-actions">
+            <button id="btnNuevo" class="btn-primary">+ Nuevo profesional</button>
+            <button id="logoutBtn" class="btn-secondary">Cerrar sesión</button>
+        </div>
+    </header>
+
+    <main class="admin-main">
+        <section id="profesionalesLista" class="admin-list"></section>
+        <p id="profesionalesEmpty" class="admin-empty" hidden>
+            Aún no hay profesionales cargados. Creá el primero con "Nuevo profesional".
+        </p>
+    </main>
+
+    <div id="formModal" class="admin-modal" hidden>
+        <div class="admin-modal-card">
+            <h2 id="formModalTitle" class="admin-modal-title">Nuevo profesional</h2>
+
+            <form id="profesionalForm" class="admin-form" novalidate>
+                <div class="admin-form-grid">
+                    <div class="form-group">
+                        <label for="f_nombre">Nombre *</label>
+                        <input type="text" id="f_nombre" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_especialidad">Especialidad *</label>
+                        <input type="text" id="f_especialidad" class="form-control" placeholder="Reiki, Tarot, Constelaciones..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_rating">Rating (0–5)</label>
+                        <input type="number" id="f_rating" class="form-control" min="0" max="5" step="0.1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_modalidad">Modalidad</label>
+                        <input type="text" id="f_modalidad" class="form-control" placeholder="Online / Presencial">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_experiencia">Experiencia</label>
+                        <input type="text" id="f_experiencia" class="form-control" placeholder="+7 años">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_whatsapp">WhatsApp (opcional)</label>
+                        <input type="tel" id="f_whatsapp" class="form-control" placeholder="+5493511234567">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="f_email">Email (opcional)</label>
+                        <input type="email" id="f_email" class="form-control" placeholder="contacto@ejemplo.com">
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="f_bio">Bio</label>
+                        <textarea id="f_bio" class="form-control" rows="4"></textarea>
+                    </div>
+
+                    <div class="form-group form-group-full">
+                        <label for="f_imagen">Imagen (JPG/PNG, máx 2 MB)</label>
+                        <input type="file" id="f_imagen" accept="image/*">
+                        <img id="imgPreview" class="admin-img-preview" alt="" hidden>
+                    </div>
+
+                    <div class="form-group form-group-full admin-checks">
+                        <label class="admin-check">
+                            <input type="checkbox" id="f_activo"> Activo (visible en la web pública)
+                        </label>
+                        <label class="admin-check">
+                            <input type="checkbox" id="f_destacado"> Destacado (candidato al home)
+                        </label>
+                    </div>
+                </div>
+
+                <p id="formError" class="admin-error" role="alert"></p>
+
+                <div class="admin-form-actions">
+                    <button type="button" id="btnCancelar" class="btn-secondary">Cancelar</button>
+                    <button type="submit" id="btnGuardar" class="btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="../js/admin-guard.js"></script>
+    <script type="module" src="../js/admin-panel.js"></script>
+</body>
+</html>

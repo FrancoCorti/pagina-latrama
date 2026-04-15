@@ -1,0 +1,15 @@
+.DS_Store
+Thumbs.db
+.vscode/
+
+*.suo
+*.user
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
