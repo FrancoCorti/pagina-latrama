@@ -3,6 +3,17 @@
  */
 
 import { cargarProfesionalesDesdeFirestore } from "./data-source.js";
+import { optimizarUrlCloudinary } from "./admin-storage.js";
+
+const PLACEHOLDER_IMG = "assets/placeholder-profesional.svg";
+
+function srcImg(url, width = 400) {
+    return url ? optimizarUrlCloudinary(url, { width }) : PLACEHOLDER_IMG;
+}
+
+function parseEspecialidades(str) {
+    return (str || '').split(',').map(t => t.trim()).filter(Boolean);
+}
 
 // Datos de respaldo (Graceful Degradation) por si Firestore falla
 const fallbackProfesionales = [
@@ -45,7 +56,6 @@ function initIntroSplash() {
 async function cargarDatosDeBase() {
     try {
         profesionales = await cargarProfesionalesDesdeFirestore();
-        console.log("Datos cargados exitosamente desde Firestore:", profesionales);
         iniciarVistas();
     } catch (error) {
         console.error("Error cargando base de datos, usando respaldo.", error);
@@ -62,7 +72,8 @@ function iniciarVistas() {
 
     if (pageType === 'home') {
         const homeGrid = document.getElementById('grid-profesionales');
-        renderizarProfesionales(profesionales.slice(0, 3), homeGrid);
+        const destacados = profesionales.filter(p => p.destacado);
+        renderizarProfesionales((destacados.length ? destacados : profesionales).slice(0, 6), homeGrid);
     } 
     
     else if (pageType === 'directorio') {
@@ -75,9 +86,7 @@ function iniciarVistas() {
 
         // Poblar el filtro de especialidades dinámicamente desde los datos reales
         const especialidades = [...new Set(
-            profesionales
-                .map(p => p.especialidad ? p.especialidad.trim() : '')
-                .filter(e => e !== '')
+            profesionales.flatMap(p => parseEspecialidades(p.especialidad))
         )].sort();
 
         techFilter.innerHTML = '<option value="all">Todas las Técnicas</option>';
@@ -95,18 +104,28 @@ function iniciarVistas() {
 
             let resultado = profesionales.filter(p => {
                 const nombre = (p.nombre || '').toLowerCase().trim();
-                const especialidad = (p.especialidad || '').toLowerCase().trim();
+                const tags = parseEspecialidades(p.especialidad);
 
-                const coincideBusqueda = !term || nombre.includes(term) || especialidad.includes(term);
-                // Comparación normalizada: ignorar espacios extras y mayúsculas
-                const coincideTecnica = tech === 'all' || (p.especialidad || '').trim() === tech;
+                const coincideBusqueda = !term || nombre.includes(term) || tags.some(t => t.toLowerCase().includes(term));
+                const coincideTecnica = tech === 'all' || tags.includes(tech);
                 return coincideBusqueda && coincideTecnica;
             });
 
             if (sortMode === 'rating-desc') {
-                resultado.sort((a, b) => b.rating - a.rating);
+                resultado.sort((a, b) => {
+                    const destA = a.vis_badge_destacado ? 1 : 0;
+                    const destB = b.vis_badge_destacado ? 1 : 0;
+                    if (destB !== destA) return destB - destA;
+                    return b.rating - a.rating;
+                });
             } else if (sortMode === 'name-asc') {
                 resultado.sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+            } else {
+                resultado.sort((a, b) => {
+                    const pa = a.vis_orden_top ?? Infinity;
+                    const pb = b.vis_orden_top ?? Infinity;
+                    return pa - pb;
+                });
             }
 
             renderizarProfesionales(resultado, fullGrid);
@@ -143,15 +162,28 @@ function iniciarVistas() {
 function renderizarProfesionales(lista, contenedor) {
     if (!contenedor) return;
     
-    contenedor.innerHTML = lista.map((pro, i) => `
-        <article class="card reveal" style="transition-delay: ${i * 0.1}s;">
-            <img src="${pro.img}" alt="Guía ${pro.nombre}" loading="lazy">
+    contenedor.innerHTML = lista.map((pro, i) => {
+        const esGrande = pro.vis_tarjeta_grande && document.body.dataset.page === 'directorio';
+        const src = srcImg(pro.img, 400);
+        const imgHTML = esGrande
+            ? `<div class="card-img-wrap" style="--card-bg: url('${src}')">
+                <img class="card-img-main" src="${src}" alt="Guía ${pro.nombre}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}';this.onerror=null">
+               </div>`
+            : `<img src="${src}" alt="Guía ${pro.nombre}" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}';this.onerror=null">`;
+        const badges = [
+            pro.vis_badge_destacado ? `<span class="card-vis-badge card-vis-badge--destacado">Destacado</span>` : '',
+            pro.vis_badge_verificado ? `<span class="card-vis-badge card-vis-badge--verificado">Verificado</span>` : '',
+        ].filter(Boolean).join('');
+        return `
+        <article class="card reveal${esGrande ? ' card--grande' : ''}" style="transition-delay: ${i * 0.1}s;">
+            ${imgHTML}
+            ${badges ? `<div class="card-vis-badges">${badges}</div>` : ''}
             <h3>${pro.nombre}</h3>
-            <p style="color: #E94560; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
-                ${pro.especialidad}
-            </p>
+            <div class="card-tags">
+                ${parseEspecialidades(pro.especialidad).map(t => `<span class="card-tag">${t}</span>`).join('')}
+            </div>
             <div class="stars">
-                ${obtenerEstrellasHTML(pro.rating)} 
+                ${obtenerEstrellasHTML(pro.rating)}
                 <span style="color: var(--text-light); opacity: 0.6; font-size: 0.8rem; margin-left: 5px;">
                     (${pro.rating})
                 </span>
@@ -160,7 +192,8 @@ function renderizarProfesionales(lista, contenedor) {
                 Ver Perfil
             </button>
         </article>
-    `).join('');
+    `;
+    }).join('');
 
     initScrollAnimations();
 }
@@ -169,6 +202,28 @@ function obtenerEstrellasHTML(rating) {
     const fullStars = Math.floor(rating) || 0;
     const limitStars = fullStars > 5 ? 5 : (fullStars < 0 ? 0 : fullStars);
     return "★".repeat(limitStars) + "☆".repeat(5 - limitStars);
+}
+
+const REDES_CONFIG = [
+    { key: 'instagram', label: 'Instagram', color: '#E1306C', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>` },
+    { key: 'facebook',  label: 'Facebook',  color: '#1877F2', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>` },
+    { key: 'tiktok',    label: 'TikTok',    color: '#ffffff', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.75a4.85 4.85 0 0 1-1.01-.06z"/></svg>` },
+    { key: 'youtube',   label: 'YouTube',   color: '#FF0000', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>` },
+    { key: 'linkedin',  label: 'LinkedIn',  color: '#0A66C2', svg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>` },
+    { key: 'sitio_web', label: 'Sitio web', color: '#a78bfa', svg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>` },
+];
+
+function construirRedesSociales(pro) {
+    const links = REDES_CONFIG.filter(r => pro[r.key]);
+    if (!links.length) return '';
+    return `
+        <div class="modal-redes">
+            ${links.map(r => `
+                <a href="${pro[r.key]}" target="_blank" rel="noopener" class="modal-red-btn" style="--red-color:${r.color}" title="${r.label}">
+                    ${r.svg}
+                </a>
+            `).join('')}
+        </div>`;
 }
 
 const WHATSAPP_SVG = `
@@ -180,7 +235,7 @@ function construirBotonWhatsapp(pro) {
     const numero = (pro.whatsapp || "").replace(/\D/g, "");
     if (!numero) {
         return `
-            <button class="btn-primary" disabled style="width: 100%; font-size: 1.1rem; padding: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; opacity: 0.5; cursor: not-allowed;">
+            <button class="btn-wa btn-wa--disabled" disabled>
                 ${WHATSAPP_SVG} Contacto no disponible
             </button>
         `;
@@ -188,8 +243,8 @@ function construirBotonWhatsapp(pro) {
     const mensaje = encodeURIComponent(`Hola ${pro.nombre || ""}, vi tu perfil en La Trama y me gustaría reservar un turno.`);
     const url = `https://wa.me/${numero}?text=${mensaje}`;
     return `
-        <a href="${url}" target="_blank" rel="noopener" style="text-decoration:none;">
-            <button class="btn-primary" style="width: 100%; font-size: 1.1rem; padding: 1.2rem; display: flex; justify-content: center; align-items: center; gap: 10px; background: #25D366;">
+        <a href="${url}" target="_blank" rel="noopener" class="btn-wa-link">
+            <button class="btn-wa">
                 ${WHATSAPP_SVG} Reservar por WhatsApp
             </button>
         </a>
@@ -251,10 +306,12 @@ window.abrirModal = function(id) {
     modalBody.innerHTML = `
         <div class="modal-grid">
             <div class="modal-image-container">
-                <img src="${pro.img}" alt="${pro.nombre}" class="modal-image">
+                <img src="${srcImg(pro.img, 600)}" alt="${pro.nombre}" class="modal-image" onerror="this.src='${PLACEHOLDER_IMG}';this.onerror=null">
             </div>
             <div class="modal-info">
-                <span class="modal-badge">${pro.especialidad}</span>
+                <div class="modal-badges">
+                    ${parseEspecialidades(pro.especialidad).map(t => `<span class="modal-badge">${t}</span>`).join('')}
+                </div>
                 <h2 class="modal-title">${pro.nombre}</h2>
                 <div class="stars" style="margin-bottom: 1.5rem; font-size: 1.1rem;">
                     ${obtenerEstrellasHTML(pro.rating)} 
@@ -274,7 +331,29 @@ window.abrirModal = function(id) {
                     </div>
                 </div>
 
+                ${construirRedesSociales(pro)}
                 ${construirBotonWhatsapp(pro)}
+                ${pro.credenciales?.length ? `
+                <div class="cred-accordion" style="margin-top:0.75rem;">
+                    <button class="btn-ver-cred" onclick="toggleCredDropdown(this)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h6M9 17h4"/></svg>
+                        Credenciales (${pro.credenciales.length})
+                        <svg class="cred-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                    <div class="cred-accordion-list" hidden>
+                        ${pro.credenciales.map(c => {
+                            const esPdf = c.url.split('?')[0].toLowerCase().endsWith('.pdf');
+                            return `<div class="cred-item-row" onclick="verCredencial('${c.url.replace(/'/g,"\\'")}',${esPdf})">
+                                <div class="cred-item-icon">${esPdf ? iconPdf : iconDoc}</div>
+                                <div class="cred-item-text">
+                                    <span class="cred-item-nombre">${c.nombre}</span>
+                                    <span class="cred-item-tipo">${c.tipo}</span>
+                                </div>
+                                <span class="cred-item-arrow">→</span>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>` : ''}
             </div>
         </div>
     `;
@@ -309,6 +388,55 @@ function initModalEvents() {
         }
     });
 }
+
+// ==========================================
+// 7. DROPDOWN CREDENCIALES (accordion inline)
+// ==========================================
+
+window.toggleCredDropdown = function(btn) {
+    const list = btn.nextElementSibling;
+    const opening = list.hidden;
+    list.hidden = !opening;
+    btn.classList.toggle('open', opening);
+};
+
+const iconPdf = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`;
+const iconDoc = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>`;
+
+function ensureViewerModal() {
+    if (document.getElementById('credViewerModal')) return;
+    const el = document.createElement('div');
+    el.id = 'credViewerModal';
+    el.className = 'cred-viewer-overlay hidden';
+    el.innerHTML = `
+        <button class="cred-viewer-close" onclick="cerrarViewer()" aria-label="Cerrar">✕</button>
+        <div class="cred-viewer-inner" id="credViewerInner"></div>`;
+    document.body.appendChild(el);
+    el.addEventListener('click', (e) => { if (e.target === el) cerrarViewer(); });
+}
+
+window.verCredencial = function(url, esPdf) {
+    ensureViewerModal();
+    const inner = document.getElementById('credViewerInner');
+    if (esPdf) {
+        inner.innerHTML = `<iframe src="${url}" class="cred-viewer-iframe" title="Documento"></iframe>`;
+    } else {
+        inner.innerHTML = `<img src="${url}" class="cred-viewer-img" alt="Credencial">`;
+    }
+    const modal = document.getElementById('credViewerModal');
+    modal.classList.remove('hidden');
+    setTimeout(() => modal.classList.add('active'), 10);
+};
+
+window.cerrarViewer = function() {
+    const modal = document.getElementById('credViewerModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.getElementById('credViewerInner').innerHTML = '';
+    }, 250);
+};
 
 // ==========================================
 // 8. MENÚ HAMBURGUESA

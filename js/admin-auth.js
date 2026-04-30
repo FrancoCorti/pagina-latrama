@@ -1,8 +1,4 @@
-import { auth } from "./firebase-config.js";
-import {
-    signInWithEmailAndPassword,
-    onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { supabase } from "./supabase-config.js";
 
 const form = document.getElementById("loginForm");
 const emailInput = document.getElementById("loginEmail");
@@ -10,8 +6,8 @@ const passInput = document.getElementById("loginPassword");
 const errorBox = document.getElementById("loginError");
 const submitBtn = document.getElementById("loginSubmit");
 
-onAuthStateChanged(auth, (user) => {
-    if (user) window.location.replace("panel.html");
+supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) window.location.replace("panel.html");
 });
 
 form.addEventListener("submit", async (e) => {
@@ -20,35 +16,24 @@ form.addEventListener("submit", async (e) => {
     submitBtn.disabled = true;
     submitBtn.textContent = "Ingresando...";
 
-    try {
-        await signInWithEmailAndPassword(
-            auth,
-            emailInput.value.trim(),
-            passInput.value
-        );
-        window.location.href = "panel.html";
-    } catch (err) {
-        errorBox.textContent = traducirError(err.code);
+    const { error } = await supabase.auth.signInWithPassword({
+        email: emailInput.value.trim(),
+        password: passInput.value
+    });
+
+    if (error) {
+        errorBox.textContent = traducirError(error.message);
         submitBtn.disabled = false;
         submitBtn.textContent = "Ingresar";
+    } else {
+        window.location.href = "panel.html";
     }
 });
 
-function traducirError(code) {
-    switch (code) {
-        case "auth/invalid-email":
-            return "Email inválido.";
-        case "auth/user-disabled":
-            return "Este usuario está deshabilitado.";
-        case "auth/user-not-found":
-        case "auth/wrong-password":
-        case "auth/invalid-credential":
-            return "Credenciales incorrectas.";
-        case "auth/too-many-requests":
-            return "Demasiados intentos. Esperá unos minutos.";
-        case "auth/network-request-failed":
-            return "Problema de conexión. Revisá tu red.";
-        default:
-            return "No se pudo iniciar sesión. Intentalo de nuevo.";
-    }
+function traducirError(message) {
+    if (message.includes("Invalid login credentials")) return "Credenciales incorrectas.";
+    if (message.includes("Email not confirmed")) return "Email no confirmado. Revisá tu casilla.";
+    if (message.includes("too many requests") || message.includes("rate limit")) return "Demasiados intentos. Esperá unos minutos.";
+    if (message.includes("network") || message.includes("fetch")) return "Problema de conexión. Revisá tu red.";
+    return "No se pudo iniciar sesión. Intentalo de nuevo.";
 }

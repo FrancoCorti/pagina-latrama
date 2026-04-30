@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 </head>
 <body class="admin-body">
 
@@ -36,9 +37,12 @@
                         <input type="text" id="f_nombre" class="form-control" required>
                     </div>
 
-                    <div class="form-group">
-                        <label for="f_especialidad">Especialidad *</label>
-                        <input type="text" id="f_especialidad" class="form-control" placeholder="Reiki, Tarot, Constelaciones..." required>
+                    <div class="form-group form-group-full">
+                        <label>Especialidad *</label>
+                        <div class="tag-input" id="tagInputEspecialidad">
+                            <input type="text" id="f_especialidad_input" placeholder="Escribí y presioná Enter o coma…" autocomplete="off">
+                        </div>
+                        <p class="tag-input-hint">Enter o coma para agregar · Backspace para borrar</p>
                     </div>
 
                     <div class="form-group">
@@ -71,6 +75,33 @@
                         <textarea id="f_bio" class="form-control" rows="4"></textarea>
                     </div>
 
+                    <div class="form-group form-group-full admin-section-label">Redes sociales</div>
+
+                    <div class="form-group">
+                        <label for="f_instagram">Instagram</label>
+                        <input type="url" id="f_instagram" class="form-control" placeholder="https://instagram.com/usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_facebook">Facebook</label>
+                        <input type="url" id="f_facebook" class="form-control" placeholder="https://facebook.com/pagina">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_tiktok">TikTok</label>
+                        <input type="url" id="f_tiktok" class="form-control" placeholder="https://tiktok.com/@usuario">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_youtube">YouTube</label>
+                        <input type="url" id="f_youtube" class="form-control" placeholder="https://youtube.com/@canal">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_linkedin">LinkedIn</label>
+                        <input type="url" id="f_linkedin" class="form-control" placeholder="https://linkedin.com/in/nombre">
+                    </div>
+                    <div class="form-group">
+                        <label for="f_sitio_web">Sitio web</label>
+                        <input type="url" id="f_sitio_web" class="form-control" placeholder="https://mipagina.com">
+                    </div>
+
                     <div class="form-group form-group-full">
                         <label for="f_imagen">Imagen (JPG/PNG, máx 2 MB)</label>
                         <input type="file" id="f_imagen" accept="image/*">
@@ -81,9 +112,46 @@
                         <label class="admin-check">
                             <input type="checkbox" id="f_activo"> Activo (visible en la web pública)
                         </label>
-                        <label class="admin-check">
-                            <input type="checkbox" id="f_destacado"> Destacado (candidato al home)
+                    </div>
+
+                    <div class="form-group form-group-full admin-section-label">Beneficios de Visibilidad</div>
+
+                    <div class="form-group form-group-full admin-vis-grid">
+                        <label class="admin-vis-check">
+                            <input type="checkbox" id="f_destacado">
+                            <div class="admin-vis-check-body">
+                                <strong>Home · Guías Destacados</strong>
+                                <small>Aparece en la sección principal de la página de inicio</small>
+                            </div>
                         </label>
+                        <label class="admin-vis-check">
+                            <input type="checkbox" id="f_vis_badge_destacado">
+                            <div class="admin-vis-check-body">
+                                <strong>Badge "Destacado"</strong>
+                                <small>Etiqueta dorada visible en su tarjeta del directorio</small>
+                            </div>
+                        </label>
+                        <label class="admin-vis-check">
+                            <input type="checkbox" id="f_vis_badge_verificado">
+                            <div class="admin-vis-check-body">
+                                <strong>Badge "Verificado"</strong>
+                                <small>Indica que La Trama verificó su identidad y credenciales</small>
+                            </div>
+                        </label>
+                        <label class="admin-vis-check">
+                            <input type="checkbox" id="f_vis_tarjeta_grande">
+                            <div class="admin-vis-check-body">
+                                <strong>Tarjeta Destacada</strong>
+                                <small>Su tarjeta ocupa más espacio visual en el directorio</small>
+                            </div>
+                        </label>
+                        <div class="admin-vis-check admin-vis-check--orden">
+                            <div class="admin-vis-check-body">
+                                <strong>Posición en el Directorio</strong>
+                                <small>Dejá vacío para sin prioridad, o ingresá un número (1 = primero)</small>
+                            </div>
+                            <input type="number" id="f_vis_orden_top" class="form-control admin-vis-orden-input" min="1" max="99" placeholder="—">
+                        </div>
                     </div>
                 </div>
 
@@ -97,6 +165,67 @@
         </div>
     </div>
 
+    <div id="credencialesModal" class="admin-modal" hidden>
+        <div class="admin-modal-card">
+            <h2 id="credencialesModalTitle" class="admin-modal-title"></h2>
+
+            <div id="credencialesLista" class="cred-lista"></div>
+
+            <hr class="cred-divider">
+            <h3 class="cred-upload-title">Cargar nueva credencial</h3>
+
+            <div class="cred-upload-form">
+                <div class="admin-form-grid">
+                    <div class="form-group">
+                        <label for="c_nombre">Nombre del documento *</label>
+                        <input type="text" id="c_nombre" class="form-control" placeholder="Diploma en Reiki Usui">
+                    </div>
+                    <div class="form-group">
+                        <label for="c_tipo">Tipo</label>
+                        <select id="c_tipo" class="form-control">
+                            <option value="Diploma">Diploma</option>
+                            <option value="Certificado">Certificado</option>
+                            <option value="Credencial">Credencial</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group form-group-full">
+                        <label for="c_archivo">Archivo (imagen o PDF, máx 5 MB)</label>
+                        <input type="file" id="c_archivo" accept="image/*,.pdf,application/pdf">
+                    </div>
+                </div>
+
+                <p id="credError" class="admin-error" role="alert"></p>
+
+                <div class="admin-form-actions">
+                    <button type="button" id="btnCerrarCred" class="btn-secondary">Cerrar</button>
+                    <button type="button" id="btnSubirCred" class="btn-primary">Subir documento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="cropModal" class="admin-modal" hidden>
+        <div class="admin-modal-card crop-modal-card">
+            <h2 class="admin-modal-title">Ajustar foto de perfil</h2>
+            <p class="crop-hint">Mové la imagen para centrar la cara · Pellizco para hacer zoom</p>
+            <div class="crop-layout">
+                <div class="crop-container">
+                    <img id="cropImage" alt="">
+                </div>
+                <div class="crop-preview-panel">
+                    <p class="crop-preview-label">Vista previa en tarjeta</p>
+                    <div class="crop-preview-box"></div>
+                </div>
+            </div>
+            <div class="admin-form-actions">
+                <button type="button" id="btnCancelCrop" class="btn-secondary">Cancelar</button>
+                <button type="button" id="btnConfirmCrop" class="btn-primary">Confirmar recorte</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     <script type="module" src="../js/admin-guard.js"></script>
     <script type="module" src="../js/admin-panel.js"></script>
 </body>

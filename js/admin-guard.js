@@ -1,24 +1,26 @@
-import { auth } from "./firebase-config.js";
-import {
-    onAuthStateChanged,
-    signOut
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { supabase } from "./supabase-config.js";
 
 export const authReady = new Promise((resolve) => {
-    onAuthStateChanged(auth, (user) => {
-        if (!user) {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session) {
             window.location.replace("login.html");
             return;
         }
         document.body.dataset.authReady = "true";
-        resolve(user);
+        resolve(session.user);
     });
+});
+
+supabase.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT" || !session) {
+        window.location.replace("login.html");
+    }
 });
 
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
     logoutBtn.addEventListener("click", async () => {
-        await signOut(auth);
+        await supabase.auth.signOut();
         window.location.replace("login.html");
     });
 }
